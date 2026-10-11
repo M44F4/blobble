@@ -18,7 +18,7 @@ conflicts=("$_name")
 source=("$_name-$pkgver.deb::$url/releases/download/v$pkgver/Blobble_${pkgver}_amd64.deb"
         "LICENSE-$pkgver::https://raw.githubusercontent.com/M44F4/blobble/v$pkgver/LICENSE"
         "THIRD_PARTY_NOTICES-$pkgver.md::https://raw.githubusercontent.com/M44F4/blobble/v$pkgver/THIRD_PARTY_NOTICES.md")
-sha256sums=('1a221e1f5e280dc567c2b5fcece759757d6087a819844ddfd7655a6fb5cab010'
+sha256sums=('285b500dc93ff28273eba193db325cc484a64af5cd3108cf168b4999c60d6954'
             'SKIP'
             'SKIP')
 noextract=("$_name-$pkgver.deb")
