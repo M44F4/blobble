@@ -1,0 +1,61 @@
+name: Install check
+
+# Installs the latest release's packages in clean containers and checks that the app's libraries
+# resolve and that it can put its Omarchy widget in place. Run it from the Actions tab after a release.
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  check:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debian 12 (.deb)
+            image: debian:12
+            pattern: "*.deb"
+            install: apt-get update -qq && apt-get install -y -qq /pkg/*.deb
+          - name: Ubuntu 24.04 (.deb)
+            image: ubuntu:24.04
+            pattern: "*.deb"
+            install: apt-get update -qq && apt-get install -y -qq /pkg/*.deb
+          - name: Fedora (.rpm)
+            image: fedora:latest
+            pattern: "*.rpm"
+            install: dnf install -y -q /pkg/*.rpm
+          - name: Arch (PKGBUILD)
+            image: archlinux:latest
+            pattern: ""
+            install: |
+              pacman -Syu --noconfirm --needed base-devel sudo >/dev/null
+              useradd -m builder && echo 'builder ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+              cp -r /src/packaging/arch /home/builder/pkg && chown -R builder /home/builder/pkg
+              su builder -c 'cd ~/pkg && makepkg -si --noconfirm >/dev/null'
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download the release packages
+        if: matrix.pattern != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir pkg
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern '${{ matrix.pattern }}' --dir pkg
+          ls -l pkg
+      - name: Install and check
+        run: |
+          cat > check.sh <<'EOS'
+          set -e
+          ${{ matrix.install }}
+          command -v blobble
+          if ldd "$(command -v blobble)" | grep "not found"; then echo "Missing libraries"; exit 1; fi
+          export HOME=/tmp/home XDG_CONFIG_HOME=/tmp/home/.config
+          mkdir -p "$XDG_CONFIG_HOME/omarchy"
+          blobble --install-widget
+          test -f "$XDG_CONFIG_HOME/omarchy/plugins/m44f4.blobble/BarWidget.qml"
+          echo "OK"
+          EOS
+          docker run --rm -v "$PWD/pkg:/pkg:ro" -v "$PWD:/src:ro" -v "$PWD/check.sh:/check.sh:ro" ${{ matrix.image }} bash /check.sh
