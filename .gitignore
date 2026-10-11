@@ -1,0 +1,7 @@
+node_modules/
+target/
+dist/
+.DS_Store
+.claude/
+desktop/ui/core/
+desktop/src-tauri/gen/

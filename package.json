@@ -1,0 +1,21 @@
+{
+  "name": "blobble",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "description": "A cozy little companion made from your name, for any desktop.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "play": "python3 -m http.server 8080",
+    "glyphs": "node scripts/make-glyphs.mjs"
+  },
+  "devDependencies": {
+    "@mdi/svg": "^7.4.47"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M44F4/blobble.git"
+  },
+  "author": "M44F4"
+}

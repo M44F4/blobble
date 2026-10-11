@@ -1,0 +1,49 @@
+name: Works on my desktop
+description: Tried Blobble on your desktop? Tell us what works and what does not.
+title: "[desktop] "
+labels: ["desktop report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Reports like this decide what gets fixed next, and the person who runs a desktop is
+        the best one to fix it, so say if you would like to try.
+  - type: input
+    id: desktop
+    attributes:
+      label: Desktop and distro
+      description: Desktop or compositor, display server (Wayland or X11) and distro, with versions.
+      placeholder: Sway 1.10 (Wayland) on Fedora 41
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Blobble version
+      placeholder: 0.1.2 (Settings > About)
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What works
+      options:
+        - label: The app starts and the blob is in my tray or bar
+        - label: The panel opens and looks right
+        - label: The desktop pet shows and I can drag it
+        - label: Its eyes follow my cursor
+        - label: It reacts to music, CPU, battery or sleep
+        - label: It reacts to workspaces, windows or notifications
+  - type: textarea
+    id: notes
+    attributes:
+      label: What does not work, or looks off
+      description: A screenshot or a short recording helps a lot.
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to help fix it?
+      options:
+        - "Maybe, point me to where to look"
+        - "Yes, I would like to take it"
+        - "No, just reporting"

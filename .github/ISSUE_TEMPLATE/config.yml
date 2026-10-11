@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/M44F4/blobble/discussions
+    about: Ask how something works, or share what you would like Blobble to do.

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blobble Playground</title>
+<style>
+  :root { --bg: #f4f2ee; --panel: #fff; --fg: #222; --muted: #777; --line: #ddd; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #16161c; --panel: #1f1f27; --fg: #e4e4e4; --muted: #999; --line: #333; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  main { display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; max-width: 960px; margin: auto; }
+  #stage { flex: 1 1 320px; display: grid; place-items: center; min-height: 360px; background: var(--panel); border-radius: 12px; }
+  #stage svg { width: min(320px, 80vw); height: auto; }
+  aside { flex: 1 1 280px; background: var(--panel); border-radius: 12px; padding: 12px 16px; }
+  label { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; }
+  input[type=text] { flex: 1; padding: 4px 6px; }
+  h2 { font-size: 12px; text-transform: uppercase; color: var(--muted); margin: 12px 0 4px; }
+  button { margin: 2px 4px 2px 0; }
+  #reasons { color: var(--muted); font-size: 13px; min-height: 2em; }
+  code { font-size: 12px; word-break: break-all; }
+</style>
+</head>
+<body>
+<main>
+  <div id="stage"></div>
+  <aside>
+    <label>Name <input type="text" id="seed" value="blobble"></label>
+    <h2>Fake sensors</h2>
+    <label>Music playing <input type="checkbox" id="music"></label>
+    <label>CPU % <input type="range" id="cpu" min="0" max="100" value="10"></label>
+    <label>Strained for 15 s <input type="checkbox" id="strained"></label>
+    <label>Battery % <input type="range" id="battery" min="0" max="100" value="80"></label>
+    <label>Charging <input type="checkbox" id="charging"></label>
+    <label>Away (asleep) <input type="checkbox" id="asleep"></label>
+    <label>Offline <input type="checkbox" id="offline"></label>
+    <h2>Events</h2>
+    <div id="events"></div>
+    <h2>Mood</h2>
+    <div id="reasons"></div>
+    <h2>Share code</h2>
+    <code id="share"></code>
+  </aside>
+</main>
+<script type="module">
+import * as Mood from "../core/MoodEngine.mjs";
+import * as Render from "../core/Render.mjs";
+import * as Share from "../core/Share.mjs";
+
+const $ = (id) => document.getElementById(id);
+const events = [];
+["notify", "critical", "poke", "workspace", "commandOk", "commandFail", "downloaded", "themeChanged"].forEach((kind) => {
+  const b = document.createElement("button");
+  b.textContent = kind;
+  b.onclick = () => events.push({ kind, at: performance.now() });
+  $("events").append(b);
+});
+
+function input(now) {
+  const cpu = +$("cpu").value;
+  return {
+    now,
+    date: new Date(),
+    asleep: $("asleep").checked,
+    music: { playing: $("music").checked, title: "Song", artist: "Artist", player: "playground" },
+    load: { cpu, temp: 50, strainedSince: $("strained").checked && cpu >= 85 ? now - 15000 : 0 },
+    battery: { present: true, percent: +$("battery").value, charging: $("charging").checked },
+    network: $("offline").checked ? { online: false } : { online: true },
+    events,
+  };
+}
+
+function frame(now) {
+  const out = Mood.resolve(input(now));
+  const t = now / 1000, m = out.motion;
+  const pose = {
+    dy: -Math.abs(Math.sin(t * 4)) * 4 * m.bob - Math.abs(Math.sin(t * 9)) * 6 * m.hop,
+    rot: Math.sin(t * 30) * 3 * m.shake,
+    sy: 1 + Math.sin(t * 2 * m.breath) * 0.02, sx: 1 - Math.sin(t * 2 * m.breath) * 0.01,
+    blink: out.eyesClosed ? 1 : (t % 4 < 0.12 ? 1 : 0),
+    gazeX: out.gaze ? out.gaze.x : 0, gazeY: out.gaze ? out.gaze.y : 0,
+    symbolPhase: t % 1,
+  };
+  $("stage").innerHTML = Render.svg({
+    seed: $("seed").value || "blob", look: {}, face: out.face, wear: out.wear,
+    symbols: out.accessories, pose, size: 320,
+    foreground: getComputedStyle(document.body).color,
+  });
+  $("reasons").textContent = out.reasons.map((r) => r.label).join(" · ") || "Idle";
+  $("share").textContent = Share.encode({ seed: $("seed").value });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

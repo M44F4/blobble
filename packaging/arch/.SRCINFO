@@ -1,0 +1,26 @@
+pkgbase = blobble-bin
+	pkgdesc = A cozy little companion made from your name: a blob in your tray, bar or desktop
+	pkgver = 0.1.2
+	pkgrel = 1
+	url = https://github.com/M44F4/blobble
+	arch = x86_64
+	license = MIT
+	depends = webkit2gtk-4.1
+	depends = gtk3
+	depends = libayatana-appindicator
+	depends = gtk-layer-shell
+	optdepends = pipewire: the mic and camera dot
+	optdepends = ffmpeg: turn a dropped video into a GIF
+	provides = blobble
+	conflicts = blobble
+	noextract = blobble-0.1.2.deb
+	options = !strip
+	options = !debug
+	source = blobble-0.1.2.deb::https://github.com/M44F4/blobble/releases/download/v0.1.2/Blobble_0.1.2_amd64.deb
+	source = LICENSE-0.1.2::https://raw.githubusercontent.com/M44F4/blobble/v0.1.2/LICENSE
+	source = THIRD_PARTY_NOTICES-0.1.2.md::https://raw.githubusercontent.com/M44F4/blobble/v0.1.2/THIRD_PARTY_NOTICES.md
+	sha256sums = 1a221e1f5e280dc567c2b5fcece759757d6087a819844ddfd7655a6fb5cab010
+	sha256sums = SKIP
+	sha256sums = SKIP
+
+pkgname = blobble-bin

@@ -1,0 +1,40 @@
+/* Colours and type shared by the pet and the panel. The accent is Windows' own (or the one you
+   pick); light or dark follows Windows. */
+:root {
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --accent: #7aa2f7;
+  --urgent: #e06c75;
+  --bg: #1b1b22;
+  --fg: #e6e6ec;
+  --popup: #1f1f27;
+  --popup-text: #ececf1;
+  --popup-line: #3a3a48;
+  --tint-04: rgba(230, 230, 236, .045);
+  --tint-05: rgba(230, 230, 236, .05);
+  --tint-07: rgba(230, 230, 236, .07);
+  --tint-09: rgba(230, 230, 236, .09);
+  --tint-10: rgba(230, 230, 236, .10);
+  --tint-12: rgba(230, 230, 236, .12);
+  --tint-18: rgba(230, 230, 236, .18);
+  --tint-25: rgba(230, 230, 236, .25);
+  --tint-35: rgba(230, 230, 236, .35);
+  --cut: var(--bg);
+  --radius: 10px;
+}
+:root.light {
+  --bg: #f4f4f7;
+  --fg: #1d1d24;
+  --popup: #fbfbfd;
+  --popup-text: #1d1d24;
+  --popup-line: #d4d4dc;
+  --tint-04: rgba(29, 29, 36, .04);
+  --tint-05: rgba(29, 29, 36, .05);
+  --tint-07: rgba(29, 29, 36, .07);
+  --tint-09: rgba(29, 29, 36, .09);
+  --tint-10: rgba(29, 29, 36, .10);
+  --tint-12: rgba(29, 29, 36, .12);
+  --tint-18: rgba(29, 29, 36, .18);
+  --tint-25: rgba(29, 29, 36, .25);
+  --tint-35: rgba(29, 29, 36, .35);
+}
+.icon .cut { fill: var(--cut); }

@@ -1,0 +1,60 @@
+[package]
+name = "blobble"
+version = "0.1.2"
+description = "A cozy little companion made from your name, for any desktop."
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/M44F4/blobble"
+authors = ["M44F4"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-notification = "2"
+base64 = "0.22"
+serde = { version = "1", features = ["derive"] }
+tauri-plugin-drag = "2"
+tauri-plugin-clipboard-manager = "2"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = { version = "5", default-features = false, features = ["blocking-api", "async-io"] }
+libc = "0.2"
+serde_json = "1"
+gtk = "0.18"
+libloading = "0.8"
+wayland-client = "0.31"
+wayland-protocols = { version = "0.32", features = ["client", "staging"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_Storage_FileSystem",
+  "Win32_System_LibraryLoader",
+  "Win32_System_Power",
+  "Win32_System_Shutdown",
+  "Win32_System_SystemInformation",
+  "Win32_System_Threading",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_Shell",
+  "Win32_UI_WindowsAndMessaging",
+] }
+windows-core = "0.61"   # the interface! macro in system.rs names it
+windows = { version = "0.61", features = [
+  "Foundation",
+  "Media_Control",
+  "Networking_Connectivity",
+  "UI_ViewManagement",
+  "Win32_Foundation",
+  "Win32_System_Com",
+  "Win32_System_WinRT",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true

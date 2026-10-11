@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blobble</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; background: transparent !important; overflow: hidden; user-select: none; }
+  #stage { position: absolute; inset: 0; }
+  #blob { position: absolute; cursor: grab; transition: opacity .26s ease; }
+  #blob.held { cursor: grabbing; }
+  #blob svg { display: block; width: 100%; height: 100%; }
+
+  /* The ring, like RingMenu.qml */
+  #ring { position: absolute; inset: 0; display: none; }
+  #ring.on { display: block; }
+  #ring svg.arc { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .slot { position: absolute; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+    background: var(--popup); color: var(--popup-text); border: 2px solid var(--popup-line);
+    box-shadow: 0 2px 0 rgba(0,0,0,.28); transition: background .11s, color .11s, border-color .11s; }
+  .slot.lit { background: var(--accent); border-color: var(--accent); color: var(--popup); --cut: var(--accent); }
+  .slot .icon { width: 44%; height: 44%; fill: currentColor; }
+  .slot .num { position: absolute; right: -3px; top: -4px; font: 700 10px/1 var(--font); color: var(--popup-text); opacity: .6; }
+  #label { position: absolute; padding: 4px 9px; border-radius: 999px; background: var(--popup); color: var(--popup-text);
+    border: 1px solid var(--popup-line); font: 13px/1.2 var(--font); white-space: nowrap; transition: opacity .12s; }
+  #label.bold { font-weight: 700; }
+
+  /* The list menu, like Pet.qml's PopupWindow */
+  #list { position: absolute; display: none; width: 196px; padding: 6px; border-radius: 10px; background: var(--popup);
+    border: 2px solid var(--popup-line); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  #list.on { display: block; }
+  #list .row { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border-radius: 7px; cursor: pointer;
+    color: var(--popup-text); font: 13px var(--font); }
+  #list .row.lit { background: var(--tint-10); }
+  #list .row .icon { width: 16px; height: 16px; fill: currentColor; flex: none; }
+  #list .title { font: 700 12px var(--font); color: var(--popup-text); opacity: .7; padding: 4px 8px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* The time under the pet, like Pet.qml's Pill */
+  #pills { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: opacity .26s; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px; border-radius: 999px; cursor: pointer;
+    background: var(--popup); color: var(--popup-text); border: 1px solid var(--popup-line); font-variant-numeric: tabular-nums; font-family: var(--font); }
+  .pill.lit { background: var(--accent); border-color: var(--accent); color: var(--popup); --cut: var(--accent); }
+  .pill.paused { opacity: .6; }
+  .pill .icon { fill: currentColor; }
+</style>
+</head>
+<body class="pet">
+<div id="stage">
+  <div id="pills"></div>
+  <div id="blob"></div>
+  <div id="ring"><svg class="arc"><path/></svg><div id="label"></div></div>
+  <div id="list"></div>
+</div>
+<script type="module" src="pet.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blobble</title>
+<link rel="stylesheet" href="shared/theme.css">
+<link rel="stylesheet" href="panel/panel.css">
+<style>
+  .editor-top { position: sticky; top: -14px; z-index: 2; background: var(--popup); margin: -14px -14px 10px; padding: 14px 14px 0;
+    display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="scroll">
+    <div class="titlerow" id="title"></div>
+    <div id="content"></div>
+  </div>
+</div>
+<div id="tip"></div>
+<script type="module" src="panel.js"></script>
+</body>
+</html>

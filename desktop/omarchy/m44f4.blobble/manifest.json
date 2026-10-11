@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "m44f4.blobble",
+  "name": "Blobble",
+  "version": "0.1.2",
+  "author": "M44F4",
+  "license": "MIT",
+  "description": "Your Blobble in the bar. A real bar widget: the shell places it, you move it with the rest of the bar's layout, and it follows the bar to any side. Click it for Blobble's panel; right click pokes it; middle click opens the system monitor. Needs the Blobble app (it starts when you first click).",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Blobble",
+    "description": "Your blob. Click it for its mood and settings.",
+    "category": "Fun",
+    "defaultSection": "left",
+    "allowMultiple": false,
+    "defaults": {},
+    "schema": []
+  }
+}

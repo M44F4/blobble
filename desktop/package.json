@@ -1,0 +1,23 @@
+{
+  "name": "blobble-desktop",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "description": "The Blobble desktop app (Tauri): tray, taskbar, bar widget and desktop pet.",
+  "scripts": {
+    "sync": "node scripts/sync-core.mjs",
+    "icon": "node scripts/make-icon.mjs && tauri icon src-tauri/icon-source.svg",
+    "dev": "npm run sync && tauri dev",
+    "build": "npm run sync && tauri build",
+    "build:linux": "npm run sync && tauri build --bundles deb,rpm,appimage"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "gifenc": "^1.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M44F4/blobble.git"
+  },
+  "author": "M44F4"
+}
