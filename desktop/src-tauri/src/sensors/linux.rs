@@ -67,7 +67,11 @@ pub struct HyprMonitor {
 }
 
 pub fn hypr_monitor() -> Option<HyprMonitor> {
-    let list = hypr("monitors")?;
+    monitor_from(&hypr("monitors")?)
+}
+
+// The focused one of Hyprland's `monitors` list.
+fn monitor_from(list: &serde_json::Value) -> Option<HyprMonitor> {
     let m = list.as_array()?.iter().find(|m| m["focused"].as_bool() == Some(true))?;
     let num = |v: &serde_json::Value| v.as_f64().unwrap_or(0.0);
     let scale = m["scale"].as_f64().filter(|s| *s > 0.0).unwrap_or(1.0);
@@ -377,6 +381,20 @@ fn omarchy_colors() -> Option<HashMap<String, String>> {
     }).collect())
 }
 
+// `base-size` under [font] in a shell.toml.
+fn font_size_in(text: &str) -> Option<f64> {
+    let mut in_font = false;
+    for line in text.lines() {
+        let l = line.trim();
+        if l.starts_with('[') {
+            in_font = l == "[font]";
+        } else if in_font && l.starts_with("base-size") {
+            return l.split_once('=')?.1.split('#').next()?.trim().parse::<f64>().ok();
+        }
+    }
+    None
+}
+
 // What makes the panel look at home on Omarchy, like OmaBlob's popup: the theme's colours,
 // Hyprland's corner rounding and border width, and the system monospace font. None elsewhere.
 pub(super) fn shell_style() -> Option<serde_json::Value> {
@@ -388,18 +406,10 @@ pub(super) fn shell_style() -> Option<serde_json::Value> {
         let home = PathBuf::from(std::env::var("HOME").ok()?);
         let state = std::env::var("XDG_STATE_HOME").map(PathBuf::from).unwrap_or_else(|_| home.join(".local/state"));
         let config = std::env::var("XDG_CONFIG_HOME").map(PathBuf::from).unwrap_or_else(|_| home.join(".config"));
-        [config.join("omarchy/shell.toml"), state.join("omarchy/current/theme/shell.toml")].iter().find_map(|f| {
-            let text = read(f.clone())?;
-            let mut in_font = false;
-            for line in text.lines() {
-                let l = line.trim();
-                if l.starts_with('[') { in_font = l == "[font]"; }
-                else if in_font && l.starts_with("base-size") {
-                    return l.split_once('=')?.1.split('#').next()?.trim().parse::<f64>().ok();
-                }
-            }
-            None
-        }).unwrap_or(12.0)
+        [config.join("omarchy/shell.toml"), state.join("omarchy/current/theme/shell.toml")]
+            .iter()
+            .find_map(|f| font_size_in(&read(f.clone())?))
+            .unwrap_or(12.0)
     };
     Some(serde_json::json!({
         "background": colour("background"),
@@ -466,6 +476,33 @@ mod tests {
         assert!(is_editor("alacritty", "nvim ~/notes.md"));
         assert!(!is_editor("alacritty", "btop"));
         assert!(!is_editor("firefox", "vim tips - search"));
+    }
+
+    #[test]
+    fn font_size_comes_from_the_font_section() {
+        let toml = "[bar]\nbase-size = 99\n[font]\nfamily = \"x\"\nbase-size = 13.5   # px\n[other]\nbase-size = 7\n";
+        assert_eq!(font_size_in(toml), Some(13.5));
+        assert_eq!(font_size_in("[bar]\nbase-size = 9\n"), None);
+        assert_eq!(font_size_in("[font]\nbase-size = big\n"), None);
+    }
+
+    #[test]
+    fn the_focused_monitor_in_logical_pixels() {
+        let list = serde_json::json!([
+            { "focused": false, "x": 0, "y": 0, "width": 800, "height": 600, "scale": 1.0 },
+            { "focused": true, "x": 1280, "y": 0, "width": 1920, "height": 1080, "scale": 1.5, "transform": 0, "reserved": [0, 26, 0, 0] }
+        ]);
+        let m = monitor_from(&list).unwrap();
+        assert_eq!((m.x, m.y, m.w, m.h), (1280.0, 0.0, 1280.0, 720.0));
+        assert_eq!(m.reserved, [0.0, 26.0, 0.0, 0.0]);
+        assert!(monitor_from(&serde_json::json!([{ "focused": false }])).is_none());
+    }
+
+    #[test]
+    fn a_turned_monitor_swaps_width_and_height() {
+        let list = serde_json::json!([{ "focused": true, "x": 0, "y": 0, "width": 1920, "height": 1080, "scale": 1.0, "transform": 1 }]);
+        let m = monitor_from(&list).unwrap();
+        assert_eq!((m.w, m.h), (1080.0, 1920.0));
     }
 
     // Reads this machine; values only need to be in range. Run with --nocapture to see them.

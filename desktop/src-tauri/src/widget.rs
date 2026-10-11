@@ -16,7 +16,11 @@ fn config() -> Option<PathBuf> {
 
 // Returns whether anything was written.
 pub fn install() -> bool {
-    let Some(omarchy) = config().map(|c| c.join("omarchy")) else { return false };
+    config().map(|c| install_in(&c)).unwrap_or(false)
+}
+
+fn install_in(config: &std::path::Path) -> bool {
+    let omarchy = config.join("omarchy");
     if !omarchy.is_dir() {
         return false;
     }
@@ -38,4 +42,65 @@ pub fn install() -> bool {
         wrote |= std::fs::write(&file, text).is_ok();
     }
     wrote
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // A fresh config folder for a test, removed at the end.
+    struct Home(PathBuf);
+    impl Home {
+        fn new(name: &str) -> Home {
+            let dir = std::env::temp_dir().join(format!("blobble-test-{name}-{}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&dir);
+            std::fs::create_dir_all(&dir).unwrap();
+            Home(dir)
+        }
+    }
+    impl Drop for Home {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn does_nothing_off_omarchy() {
+        let home = Home::new("off");
+        assert!(!install_in(&home.0));
+        assert!(!home.0.join("omarchy").exists());
+    }
+
+    #[test]
+    fn installs_every_file_then_leaves_it_alone() {
+        let home = Home::new("on");
+        std::fs::create_dir_all(home.0.join("omarchy")).unwrap();
+        assert!(install_in(&home.0));
+        let dest = home.0.join("omarchy/plugins/m44f4.blobble");
+        for (name, text) in FILES {
+            assert_eq!(std::fs::read_to_string(dest.join(name)).unwrap(), text);
+        }
+        assert!(!install_in(&home.0), "a second run changes nothing");
+    }
+
+    #[test]
+    fn brings_an_old_widget_up_to_date() {
+        let home = Home::new("old");
+        let dest = home.0.join("omarchy/plugins/m44f4.blobble");
+        std::fs::create_dir_all(&dest).unwrap();
+        std::fs::write(dest.join("BarWidget.qml"), "old").unwrap();
+        assert!(install_in(&home.0));
+        assert_eq!(std::fs::read_to_string(dest.join("BarWidget.qml")).unwrap(), FILES[0].1);
+    }
+
+    #[test]
+    fn leaves_a_linked_plugin_folder_alone() {
+        let home = Home::new("link");
+        let checkout = home.0.join("checkout");
+        std::fs::create_dir_all(&checkout).unwrap();
+        std::fs::create_dir_all(home.0.join("omarchy/plugins")).unwrap();
+        std::os::unix::fs::symlink(&checkout, home.0.join("omarchy/plugins/m44f4.blobble")).unwrap();
+        assert!(!install_in(&home.0));
+        assert!(std::fs::read_dir(&checkout).unwrap().next().is_none());
+    }
 }

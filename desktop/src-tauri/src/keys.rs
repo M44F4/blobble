@@ -60,3 +60,30 @@ pub fn keys_apply(ring: String, popup: String) {
     }
     let _ = std::process::Command::new("hyprctl").arg("eval").arg(script.join("; ")).output();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn names_the_modifiers_in_a_fixed_order() {
+        assert_eq!(bind_name(&json!({ "modmask": 64 | 8, "key": "b" })), "SUPER + ALT + B");
+        assert_eq!(bind_name(&json!({ "modmask": 1 | 4, "key": "Return" })), "CTRL + SHIFT + RETURN");
+        assert_eq!(bind_name(&json!({ "key": "f1" })), "F1");
+    }
+
+    #[test]
+    fn quotes_text_for_hyprlands_lua() {
+        assert_eq!(lua("blobble --bar ring"), "'blobble --bar ring'");
+        assert_eq!(lua("it's"), "'it\\'s'");
+        assert_eq!(lua("a\\b"), "'a\\\\b'");
+    }
+
+    #[test]
+    fn only_binds_described_as_ours_are_ours() {
+        assert!(ours(&json!({ "description": "Blobble ring" })));
+        assert!(!ours(&json!({ "description": "Terminal" })));
+        assert!(!ours(&json!({})));
+    }
+}

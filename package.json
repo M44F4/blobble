@@ -6,7 +6,7 @@
   "description": "A cozy little companion made from your name, for any desktop.",
   "license": "MIT",
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "node desktop/scripts/sync-core.mjs && node --test test/*.test.mjs",
     "play": "python3 -m http.server 8080",
     "glyphs": "node scripts/make-glyphs.mjs"
   },

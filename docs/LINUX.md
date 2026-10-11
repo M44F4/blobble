@@ -43,6 +43,6 @@ the thinking and talks to the widget over `$XDG_RUNTIME_DIR/blobble/ctl.sock`. S
 - **Tray icon:** needs `libayatana-appindicator`; plain GNOME needs the AppIndicator extension.
 - **Packaging:** `npm run build:linux` makes a `.deb`, `.rpm` and AppImage, and the release
   workflow attaches them. The app installs the Omarchy widget itself (`widget.rs`). `packaging/arch/` has the `blobble-bin` PKGBUILD for Arch and Omarchy (not on the AUR yet).
-  Missing: install checks on Debian, Fedora and Arch.
+  The `Install check` workflow installs the release packages in clean Debian, Ubuntu, Fedora and Arch containers.
 - **Testing:** only Omarchy has been tried. Sway, niri, KDE, GNOME and X11 are untested.
 - **Multi monitor.**

@@ -47,3 +47,6 @@ jobs:
       - name: Compile
         run: cargo check --locked
         working-directory: desktop/src-tauri
+      - name: Rust tests
+        run: cargo test --locked
+        working-directory: desktop/src-tauri
